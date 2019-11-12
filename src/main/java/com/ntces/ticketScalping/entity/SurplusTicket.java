@@ -3,7 +3,7 @@ package com.ntces.ticketScalping.entity;
 import java.util.Date;
 
 public class SurplusTicket {
-    //0是正常，1是闭馆
+    //0是正常，1是闭馆,2是当日
     private Integer status;
     //日期
     private Date date;

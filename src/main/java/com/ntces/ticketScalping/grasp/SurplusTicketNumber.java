@@ -65,28 +65,37 @@ public class SurplusTicketNumber {
         List<SurplusTicket> surplusTicketList = new ArrayList<>();
         Date now = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String year = simpleDateFormat.format(now).substring(0, 5);
+        String today = simpleDateFormat.format(now);
+        String year = today.substring(0, 5);
         for (Element element : elements) {
-            SurplusTicket surplusTicket = new SurplusTicket();
-            //如果li元素中含有class类名代表闭馆
-            if (element.hasClass("closed")&& element.children().size()!=0) {
-                surplusTicket.setStatus(1);
-                //li中的b中的文本代表日期
-                String date = element.select("b").text().replace("月", "-");
-                date = year + date.substring(0, date.length() - 1);
-                surplusTicket.setDate(simpleDateFormat.parse(date));
-                surplusTicket.setNumber(0);
-            } else if(element.children().size()!=0){
-                surplusTicket.setStatus(0);
-                String date = element.select("b").text().replace("月", "-");
-                date = year + date.substring(0, date.length() - 1);
-                //使用element.ownText()可以获取element中的直接文本，出去element中的子元素的文本
-                String liText = element.ownText();
-                Integer number = Integer.valueOf(liText.substring(1, liText.length() - 1));
-                surplusTicket.setDate(simpleDateFormat.parse(date));
-                surplusTicket.setNumber(number);
+            if (element.children().size() != 0) {
+                SurplusTicket surplusTicket = new SurplusTicket();
+                //如果li元素中含有class类名代表闭馆
+                if (element.hasClass("closed")) {
+                    surplusTicket.setStatus(1);
+                    //li中的b中的文本代表日期
+                    String date = element.select("b").text().replace("月", "-");
+                    date = year + date.substring(0, date.length() - 1);
+                    surplusTicket.setDate(simpleDateFormat.parse(date));
+                    surplusTicket.setNumber(0);
+                } else {
+                    String date = element.select("b").text().replace("月", "-");
+                    date = year + date.substring(0, date.length() - 1);
+                    //使用element.ownText()可以获取element中的直接文本，出去element中的子元素的文本
+                    String liText = element.ownText();
+                    Integer number = null;
+                    if (date.equals(today)) {
+                        surplusTicket.setStatus(2);
+                    } else {
+                        surplusTicket.setStatus(0);
+                        number = Integer.valueOf(liText.substring(1, liText.length() - 1));
+                    }
+                    surplusTicket.setDate(simpleDateFormat.parse(date));
+                    surplusTicket.setNumber(number);
+                }
+                surplusTicketList.add(surplusTicket);
             }
-            surplusTicketList.add(surplusTicket);
+
         }
         return surplusTicketList;
     }
