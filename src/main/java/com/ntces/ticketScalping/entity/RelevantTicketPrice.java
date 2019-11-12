@@ -22,4 +22,12 @@ public class RelevantTicketPrice {
     public void setTicketRegionPrice(Double ticketRegionPrice) {
         this.ticketRegionPrice = ticketRegionPrice;
     }
+
+    @Override
+    public String toString() {
+        return "RelevantTicketPrice{" +
+                "ticketRegionCode=" + ticketRegionCode +
+                ", ticketRegionPrice=" + ticketRegionPrice +
+                '}';
+    }
 }

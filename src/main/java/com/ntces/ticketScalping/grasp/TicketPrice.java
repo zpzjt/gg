@@ -49,9 +49,9 @@ public class TicketPrice {
             if (i.equals("SUCCESS")) {
                 TicketPriceInfo ticketPriceInfo = new TicketPriceInfo();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                Date date = simpleDateFormat.parse("2019-11-12");
+                Date date = simpleDateFormat.parse("2019-11-13");
                 ticketPriceInfo.setDate(date);
-                ticketPriceInfo.setAmorpm(2);
+                ticketPriceInfo.setAmorpm(1);
                 ticketPriceInfo.setTravel(0);
                 List<TicketPriceInfo>  ticketPriceInfosList= selectPrice(client, ticketPriceInfo);
                 for(TicketPriceInfo t:ticketPriceInfosList){
@@ -126,21 +126,22 @@ public class TicketPrice {
     public List<TicketPriceInfo> analysisEntity(HttpEntity entity, TicketPriceInfo ticketPriceInfo) throws IOException {
         String entityStr = EntityUtils.toString(entity);
         Document document = Jsoup.parse(entityStr);
-        Elements elements = document.select(".PriceTypeId>option");
+        Elements elements = document.select("select#PriceTypeId>option");
         List<TicketPriceInfo> ticketPriceInfosList = new ArrayList<>();
         for (Element element : elements) {
+            TicketPriceInfo reTicketPriceInfo  = new TicketPriceInfo();
             String ticketName = element.text();
             Integer ticketAppleCrowd = null;
             List<RelevantTicketPrice> relevantTicketPriceList = new ArrayList<>();
-            if (ticketName.contentEquals("学生")) {
+            if (ticketName.contains("学生")) {
                 ticketAppleCrowd = 0;
-            } else if (ticketName.contentEquals("老人")) {
+            } else if (ticketName.contains("老人")) {
                 ticketAppleCrowd = 1;
-            } else if (ticketName.contentEquals("成人")) {
+            } else if (ticketName.contains("成人")) {
                 ticketAppleCrowd = 2;
             }
             Integer ticketStatus;
-            if (ticketName.contentEquals("联票")) {
+            if (ticketName.contains("联票")) {
                 ticketStatus = 0;
                 String remark = element.attr("remark");
                 String[] areaAndPricesArray = remark.split("，");
@@ -166,12 +167,12 @@ public class TicketPrice {
             }
             Integer ticketCode = Integer.valueOf(element.attr("value"));
             Double price = Double.valueOf(element.attr("price"));
-            ticketPriceInfo.setTicketName(ticketName);
-            ticketPriceInfo.setTicketAppleCrowd(ticketAppleCrowd);
-            ticketPriceInfo.setTicketCode(ticketCode);
-            ticketPriceInfo.setPrice(price);
-            ticketPriceInfo.setTicketStatus(ticketStatus);
-            ticketPriceInfo.setRelevantTicketPriceList(relevantTicketPriceList);
+            reTicketPriceInfo.setTicketName(ticketName);
+            reTicketPriceInfo.setTicketAppleCrowd(ticketAppleCrowd);
+            reTicketPriceInfo.setTicketCode(ticketCode);
+            reTicketPriceInfo.setPrice(price);
+            reTicketPriceInfo.setTicketStatus(ticketStatus);
+            reTicketPriceInfo.setRelevantTicketPriceList(relevantTicketPriceList);
             Integer amorpm = ticketPriceInfo.getAmorpm();
             Integer ticketSellType = null;
             if(amorpm==0||amorpm==1){
@@ -179,8 +180,11 @@ public class TicketPrice {
             }else if(amorpm==2){
                 ticketSellType=0;
             }
-            ticketPriceInfo.setTicketSellType(ticketSellType);
-            ticketPriceInfosList.add(ticketPriceInfo);
+            reTicketPriceInfo.setTicketSellType(ticketSellType);
+            reTicketPriceInfo.setAmorpm(amorpm);
+            reTicketPriceInfo.setDate(ticketPriceInfo.getDate());
+            reTicketPriceInfo.setTravel(ticketPriceInfo.getTravel());
+            ticketPriceInfosList.add(reTicketPriceInfo);
         }
         return  ticketPriceInfosList;
     }

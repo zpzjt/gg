@@ -69,18 +69,16 @@ public class SurplusTicketNumber {
         String year = today.substring(0, 5);
         for (Element element : elements) {
             if (element.children().size() != 0) {
+                String date = element.select("b").text().replace("月", "-");
+                date = year + date.substring(0, date.length() - 1);
                 SurplusTicket surplusTicket = new SurplusTicket();
                 //如果li元素中含有class类名代表闭馆
                 if (element.hasClass("closed")) {
                     surplusTicket.setStatus(1);
                     //li中的b中的文本代表日期
-                    String date = element.select("b").text().replace("月", "-");
-                    date = year + date.substring(0, date.length() - 1);
                     surplusTicket.setDate(simpleDateFormat.parse(date));
                     surplusTicket.setNumber(0);
                 } else {
-                    String date = element.select("b").text().replace("月", "-");
-                    date = year + date.substring(0, date.length() - 1);
                     //使用element.ownText()可以获取element中的直接文本，出去element中的子元素的文本
                     String liText = element.ownText();
                     Integer number = null;
